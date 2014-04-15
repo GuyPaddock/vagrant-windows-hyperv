@@ -6,7 +6,7 @@
 require "log4r"
 
 module VagrantPlugins
-  module VagrantHyperV
+  module HyperV
     module Action
       class Customize
 
@@ -25,7 +25,7 @@ module VagrantPlugins
             end
           end
           if !customizations.empty?
-            env[:ui].info "Running customizations for the machine"
+            env[:ui].info I18n.t("vagrant.actions.vm.customize.running", event: @event)
             customizations.each do |query|
               command = query[0]
               params = query[1]
@@ -60,20 +60,21 @@ module VagrantPlugins
               options[:adapter] = choose_option_from(adapters, "adapter")["Name"]
             end
           end
-          @env[:machine].provider.driver.create_network_switch(options)
+          response = @env[:machine].provider.driver.create_network_switch(options)
         end
 
         def validate_virtual_switch
           current_vm_switch = @env[:machine].provider.driver.find_vm_switch_name
-          if current_vm_switch["network_adapter"].empty?
-            raise Errors::NoNetworkAdapter
+          if current_vm_switch["network_adapter"].nil?
+            # TODO:  Create a error class in core vagrant when merged.
+            raise VagrantPlugins::VagrantHyperV::Errors::NoNetworkAdapter
           end
 
-          if current_vm_switch["switch_name"].empty?
+          if current_vm_switch["switch_name"].nil?
             switches = @env[:machine].provider.driver.execute("get_switches.ps1", {})
             raise Errors::NoSwitches if switches.empty?
 
-            switch = choose_option_from(adapters, "adapter")
+            switch = choose_option_from(switches, "adapter")
             options = { vm_id: @env[:machine].id,
                         type: switch["SwitchType"].downcase,
                         name: switch["Name"],

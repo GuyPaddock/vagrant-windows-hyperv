@@ -38,6 +38,10 @@ try {
     while (!$operation_pass -and $count -lt 5)
    }
 
+   # Add the switch to the VM's network adapter
+   $vm = Get-VM -Id $vm_id -ErrorAction "stop"
+   Get-VMNetworkAdapter -VM $vm | Connect-VMNetworkAdapter -SwitchName "$name" -ErrorAction "stop"
+
    $resultHash = @{
      message = "OK"
    }

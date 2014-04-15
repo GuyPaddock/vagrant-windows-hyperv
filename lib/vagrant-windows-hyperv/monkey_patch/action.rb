@@ -36,7 +36,7 @@ module VagrantPlugins
           end
         end
       end
-      action_root = Pathname.new(File.expand_path("../..//action", __FILE__))
+      action_root = Pathname.new(File.expand_path("../action", __FILE__))
       autoload :Customize, action_root.join("customize")
 
     end

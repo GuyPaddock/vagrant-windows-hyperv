@@ -2,17 +2,19 @@
 # Copyright (c) Microsoft Open Technologies, Inc.
 # All Rights Reserved. Licensed under the MIT License.
 #--------------------------------------------------------------------------
-# Include the following modules
-$Dir = Split-Path $script:MyInvocation.MyCommand.Path
-. ([System.IO.Path]::Combine($Dir, "utils\write_messages.ps1"))
 
 param (
     [string]$vm_id = $(throw "-vm_id is required.")
  )
 
+# Include the following modules
+$Dir = Split-Path $script:MyInvocation.MyCommand.Path
+. ([System.IO.Path]::Combine($Dir, "utils\write_messages.ps1"))
+
+
 try {
   $vm = Get-VM -Id $vm_id -ErrorAction "stop"
-  $network_adapter = Get-VMNetworkAdapter Super-Win_1_1
+  $network_adapter = Get-VMNetworkAdapter -vm $vm
   $resultHash = @{}
   $resultHash["switch_name"] = $network_adapter.SwitchName
   $resultHash["network_adapter"] = $network_adapter.Name
