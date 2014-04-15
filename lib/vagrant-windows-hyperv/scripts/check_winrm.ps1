@@ -16,8 +16,12 @@ $presentDir = Split-Path -parent $PSCommandPath
 try {
   $response = Create-Remote-Session $guest_ip $username $password
   if (!$response["session"] -and $response["error"]) {
-      Write-Host $response["error"]
-      return
+    $errortHash = @{
+      type = "PowerShellError"
+      error = $response["error"]
+    }
+    Write-Error-Message $errortHash
+    return
   }
     function Remote-Execute() {
       $winrm_state = ""
@@ -34,7 +38,7 @@ try {
   } catch {
     $errortHash = @{
       type = "PowerShellError"
-      error ="Failed to copy file $_"
+      error ="$_"
     }
     Write-Error-Message $errortHash
     return
