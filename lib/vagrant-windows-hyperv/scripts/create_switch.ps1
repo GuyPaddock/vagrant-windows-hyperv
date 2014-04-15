@@ -16,25 +16,16 @@ $modules += $presentDir + "\utils\write_messages.ps1"
 forEach ($module in $modules) { . $module }
 
 try {
-  $switch_exist = $false
-  Get-VMSwitch -SwitchType  "$type" | ForEach-Object {
-    if ( $_.name -eq $name ) {
-      $switch_exist = $true
-    }
-  }
-
-  try {
-    Get-NetAdapter -Name $adapter
-  } catch {
-
-  }
+  $switch_exist = (Get-VMSwitch -SwitchType  "$type" `
+    | Select-Object Name `
+    | Where-Object { $_.name -eq $name })
 
   $count = 0
   $operation_pass = $false
   if (-not $switch_exist ) {
     do {
       try {
-        if ($type -ne "External") {
+        if ($type -ne "external") {
           New-VMSwitch -Name "$name" -SwitchType "$type" -ErrorAction "stop"
         } else {
           New-VMSwitch -Name "$name" -NetAdapterName $adapter -ErrorAction "stop"
@@ -45,13 +36,16 @@ try {
       }
     }
     while (!$operation_pass -and $count -lt 5)
-  }
+   }
 
-  $resultHash = @{
-  message = "OK"
-  }
-  $result = ConvertTo-Json $resultHash
-  Write-Output-Message $result
-  } catch {
-    Write-Error-Message $_
-  }
+   $resultHash = @{
+     message = "OK"
+   }
+   Write-Output-Message $resultHash
+} catch {
+    $errortHash = @{
+      type = "PowerShellError"
+      error = "$_"
+    }
+    Write-Error-Message $errortHash
+}

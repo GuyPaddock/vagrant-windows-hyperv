@@ -79,6 +79,11 @@ module VagrantPlugins
         execute(script_path, {})
       end
 
+      def find_vm_switch_name
+        script_path = local_script_path('find_vm_switch_name.ps1')
+        execute(script_path, {vm_id: vm_id})
+      end
+
       protected
 
       def local_script_path(path)

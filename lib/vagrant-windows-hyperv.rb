@@ -26,7 +26,7 @@ module VagrantPlugins
     require monkey_patch.join("plugins/synced_folders/smb/synced_folders")
     require monkey_patch.join("action/provision")
     require monkey_patch.join("machine")
-    require monkey_patch.join("util/powershell")
+    # require monkey_patch.join("util/powershell")
 
     # This returns the path to the source of this plugin.
     #

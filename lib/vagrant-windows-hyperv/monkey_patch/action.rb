@@ -21,6 +21,24 @@ module VagrantPlugins
         end
       end
 
+      def self.action_reload
+        Vagrant::Action::Builder.new.tap do |b|
+          b.use ConfigValidate
+          b.use Call, IsState, :not_created do |env, b2|
+            if env[:result]
+              b2.use Message, I18n.t("vagrant_hyperv.message_not_created")
+              next
+            end
+
+            b2.use action_halt
+            b2.use Customize, "pre-boot"
+            b2.use action_start
+          end
+        end
+      end
+      action_root = Pathname.new(File.expand_path("../..//action", __FILE__))
+      autoload :Customize, action_root.join("customize")
+
     end
   end
 end
