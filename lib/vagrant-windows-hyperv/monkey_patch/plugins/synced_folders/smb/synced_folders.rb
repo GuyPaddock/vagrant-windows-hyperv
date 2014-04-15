@@ -11,6 +11,9 @@ module VagrantPlugins
 
       alias_method :original_enable, :enable
 
+      # FIXME:
+      # This is a workaround to enable the guest VM to access the SMB share
+      # set in the host.
       def enable(machine, folders, nfsopts)
         response = machine.provider.driver.get_host_ip
         host_ip = response["host_ip"]

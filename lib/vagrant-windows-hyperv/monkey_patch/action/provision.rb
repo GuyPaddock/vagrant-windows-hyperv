@@ -11,7 +11,11 @@ module Vagrant
       class Provision
 
         alias_method :original_run_provisioner, :run_provisioner
-        # Override this method from core vagrant, here we branch out the provision for windows
+        # Override this method from core vagrant, here we branch out the
+        # provision for windows
+        # FIXME:
+        # This should be removed when the core vagrant supports communication
+        # class for windows guests
         def run_provisioner(env)
           if env[:machine].config.vm.guest == :windows
             case env[:provisioner].class.to_s
