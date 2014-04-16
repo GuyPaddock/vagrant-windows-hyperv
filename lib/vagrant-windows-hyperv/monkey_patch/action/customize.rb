@@ -52,13 +52,14 @@ module VagrantPlugins
                       adapter: (params[:bridge] || "").downcase
                     }
           if options[:type] == "external"
-            adapters = env[:machine].provider.driver.list_net_adapters
+            adapters = @env[:machine].provider.driver.list_net_adapters
             available_adapters = adapters.map { |a| a["Name"].downcase }
             unless available_adapters.include? (options[:adapter])
                selected_adapter = choose_option_from(adapters, "adapter")
                options[:adapter] = selected_adapter["Name"]
             end
           end
+          @env[:ui].info "Creating a #{options[:type]} switch with name #{options[:name]}"
           response = @env[:machine].provider.driver.create_network_switch(options)
         end
 
@@ -81,14 +82,15 @@ module VagrantPlugins
               switch_type = "Internal"
             when 0
               switch_type = "Private"
-            else
+            when 2
               switch_type = "External"
             end
             options = { vm_id: @env[:machine].id,
                         type: switch_type.downcase,
                         name: switch["Name"],
-                        adapter: switch["NetAdapterInterfaceDescription"]
+                        adapter: ""
                       }
+            @env[:ui].info "Creating a #{options[:type]} switch with name #{options[:name]}"
             @env[:machine].provider.driver.create_network_switch(options)
           end
         end
