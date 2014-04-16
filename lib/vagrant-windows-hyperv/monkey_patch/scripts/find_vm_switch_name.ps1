@@ -18,11 +18,11 @@ try {
   $resultHash = @{}
   $resultHash["switch_name"] = $network_adapter.SwitchName
   $resultHash["network_adapter"] = $network_adapter.Name
-  Write-Output-Message $resultHash
+  Write-Output-Message $(ConvertTo-JSON $resultHash)
 } catch [Microsoft.HyperV.PowerShell.VirtualizationOperationFailedException] {
   $errortHash = @{
     type = "PowerShellError"
     error = "$_"
   }
-  Write-Error-Message $errortHash
+  Write-Error-Message $(ConvertTo-JSON $errortHash)
 }

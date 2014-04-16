@@ -16,7 +16,7 @@ module VagrantPlugins
               b1.use Import
             end
             b1.use Customize, "pre-boot"
-            # b1.use action_start
+            b1.use action_start
           end
         end
       end

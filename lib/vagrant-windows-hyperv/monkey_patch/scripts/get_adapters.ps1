@@ -14,4 +14,4 @@ $adapters = @()
     | ForEach-Object  -Process {
       $adapters += $_
     }
-Write-Output-Message $adapters
+Write-Output-Message $(ConvertTo-JSON $adapters)

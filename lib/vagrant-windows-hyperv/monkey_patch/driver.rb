@@ -30,7 +30,8 @@ module VagrantPlugins
       end
 
       def find_vm_switch_name
-        script_path = local_script_path('find_vm_switch_name.ps1')
+        load_path = Pathname.new(File.expand_path("../scripts", __FILE__))
+        script_path = load_path.join('find_vm_switch_name.ps1')
         execute(script_path, {vm_id: vm_id})
       end
 
