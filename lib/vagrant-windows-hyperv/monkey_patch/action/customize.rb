@@ -19,9 +19,16 @@ module VagrantPlugins
         def call(env)
           customizations = []
           @env = env
-          env[:machine].provider_config.customizations.each do |event, command|
-            if event == @event
-              customizations << command
+          # FIXME:
+          # Currently we are unable to set a default value for the customizations
+          # to the vagrant core Config initialization. This check should be removed
+          # when this code becomes a part of vagrant core.
+          custom_config = env[:machine].provider_config.customizations
+          if custom_config
+            custom_config.each do |event, command|
+              if event == @event
+                customizations << command
+              end
             end
           end
           if !customizations.empty?
@@ -35,16 +42,7 @@ module VagrantPlugins
             end
           end
           validate_virtual_switch
-
           @app.call(env)
-        end
-
-        def custom_action_memory(memory)
-          return if memory.nil? || memory.to_i == 0
-          options = { vm_id: @env[:machine].id,
-                      ram_memory: memory
-                    }
-          @env[:machine].provider.driver.execute('assign_memory.ps1', options)
         end
 
         def custom_action_virtual_switch(params)
@@ -57,13 +55,15 @@ module VagrantPlugins
             adapters = env[:machine].provider.driver.list_net_adapters
             available_adapters = adapters.map { |a| a["Name"].downcase }
             unless available_adapters.include? (options[:adapter])
-              options[:adapter] = choose_option_from(adapters, "adapter")["Name"]
+               selected_adapter = choose_option_from(adapters, "adapter")
+               options[:adapter] = selected_adapter["Name"]
             end
           end
           response = @env[:machine].provider.driver.create_network_switch(options)
         end
 
         def validate_virtual_switch
+          @env[:ui].info "Validating Virtual Switch"
           current_vm_switch = @env[:machine].provider.driver.find_vm_switch_name
           if current_vm_switch["network_adapter"].nil?
             # TODO:  Create a error class in core vagrant when merged.
@@ -75,8 +75,17 @@ module VagrantPlugins
             raise Errors::NoSwitches if switches.empty?
 
             switch = choose_option_from(switches, "adapter")
+            switch_type = nil
+            case switch["SwitchType"]
+            when 1
+              switch_type = "Internal"
+            when 0
+              switch_type = "Private"
+            else
+              switch_type = "External"
+            end
             options = { vm_id: @env[:machine].id,
-                        type: switch["SwitchType"].downcase,
+                        type: switch_type.downcase,
                         name: switch["Name"],
                         adapter: switch["NetAdapterInterfaceDescription"]
                       }
@@ -85,24 +94,25 @@ module VagrantPlugins
         end
 
         private
-
         def choose_option_from(options, key)
           if options.length > 1
-            env[:ui].detail(I18n.t("vagrant_hyperv.choose_#{key}") + "\n ")
+            @env[:ui].detail(I18n.t("vagrant_hyperv.choose_#{key}") + "\n ")
             options.each_index do |i|
               option = options[i]
-              env[:ui].detail("#{i+1}) #{option["Name"]}")
+              @env[:ui].detail("#{i+1}) #{option["Name"]}")
             end
-            env[:ui].detail(" ")
+            @env[:ui].detail(" ")
 
             selected = nil
             while !selected
-              selected = env[:ui].ask("What #{key} would you like to use? ")
+              selected = @env[:ui].ask("What #{key} would you like to use? ")
               next if !selected
               selected = selected.to_i - 1
               selected = nil if selected < 0 || selected >= options.length
             end
             options[selected]
+          else
+            options.first
           end
         end
       end
