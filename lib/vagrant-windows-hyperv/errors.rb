@@ -34,6 +34,10 @@ module VagrantPlugins
         error_key(:no_switches)
       end
 
+      class NetworkDown < VagrantHyperVError
+        error_key(:network_down)
+      end
+
     end
   end
 end

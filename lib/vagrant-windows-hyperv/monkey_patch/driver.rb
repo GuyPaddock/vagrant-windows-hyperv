@@ -35,6 +35,12 @@ module VagrantPlugins
         execute(script_path, {vm_id: vm_id})
       end
 
+      def add_swith_to_vm(options)
+        load_path = Pathname.new(File.expand_path("../scripts", __FILE__))
+        script_path = load_path.join('add_switch_to_vm.ps1')
+        execute(script_path, options)
+      end
+
     end
   end
 end

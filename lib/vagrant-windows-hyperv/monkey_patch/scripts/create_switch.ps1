@@ -20,6 +20,16 @@ try {
   # network connectivity upon creating a new switch to a network adapter
   $ip = (Get-WmiObject -class win32_NetworkAdapterConfiguration -Filter 'ipenabled = "true"').ipaddress[0]
 
+  if ($type -eq "external") {
+    $switch_exist = Get-VMSwitch -SwitchType  "$type"
+    if ($switch_exist) {
+      $resptHash = @{
+        message = "External switch exist"
+      }
+      Write-Output-Message $(ConvertTo-JSON $resptHash)
+      return
+    }
+  }
   $switch_exist = (Get-VMSwitch -SwitchType  "$type" `
     | Select-Object Name `
     | Where-Object { $_.name -eq $name })
@@ -30,7 +40,8 @@ try {
     do {
       try {
         if ($type -ne "external") {
-          New-VMSwitch -Name "$name" -SwitchType "$type" -ErrorAction "stop"
+          # Do not create a switch other than of type external
+          # New-VMSwitch -Name "$name" -SwitchType "$type" -ErrorAction "stop"
         } else {
           New-VMSwitch -Name "$name" -NetAdapterName $adapter -ErrorAction "stop"
         }
@@ -48,8 +59,8 @@ try {
 
    # Keep checking for network availability before exiting this script
    $max_attempts = 10
+   $network_available = $false
    do {
-     $network_available = $false
      try {
       $ping_response = Test-Connection "$ip" -ErrorAction "stop"
       $network_available = $true
@@ -59,16 +70,13 @@ try {
      }
    }
    while (!$network_available -and $max_attempts -gt 0)
-
-   # Add the switch to the VM's network adapter
-   $vm = Get-VM -Id $vm_id -ErrorAction "stop"
-    Get-VMSwitch "$name" | Where-Object { $_.SwitchType -eq "$type" } `
-    | Connect-VMNetworkAdapter -VMName $vm.Name
-
-   $resultHash = @{
-     message = "OK"
+   if (-not $network_available) {
+    $resptHash = @{
+      message = "Network down"
+    }
+    Write-Output-Message $(ConvertTo-JSON $resptHash)
+    return
    }
-   Write-Output-Message $(ConvertTo-JSON $resultHash)
 } catch {
     $errortHash = @{
       type = "PowerShellError"

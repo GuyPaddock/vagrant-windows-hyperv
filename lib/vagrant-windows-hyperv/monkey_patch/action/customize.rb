@@ -51,6 +51,11 @@ module VagrantPlugins
                       name: params[:name],
                       adapter: (params[:bridge] || "").downcase
                     }
+          if options[:type] == "private"
+            @env[:ui].detail I18n.t("vagrant_win_hyperv.no_private_switch")
+            return
+          end
+
           if options[:type] == "external"
             adapters = @env[:machine].provider.driver.list_net_adapters
             available_adapters = adapters.map { |a| a["Name"].downcase }
@@ -58,9 +63,19 @@ module VagrantPlugins
                selected_adapter = choose_option_from(adapters, "adapter")
                options[:adapter] = selected_adapter["Name"]
             end
+            @env[:ui].info "Creating a #{options[:type]} switch with name #{options[:name]}"
+            response = @env[:machine].provider.driver.create_network_switch(options)
+            case response["message"]
+              when "Network down"
+                # TODO:  Create a error class in core vagrant when merged.
+                raise VagrantPlugins::VagrantHyperV::Errors::NetworkDown
+              when "External switch exist"
+                @env[:ui].detail I18n.t("vagrant_win_hyperv.external_switch_exists")
+            end
+            @env[:machine].provider.driver.add_swith_to_vm(options)
+          else
+            @env[:ui].detail I18n.t("vagrant_win_hyperv.virtual_switch_info")
           end
-          @env[:ui].info "Creating a #{options[:type]} switch with name #{options[:name]}"
-          response = @env[:machine].provider.driver.create_network_switch(options)
         end
 
         def validate_virtual_switch
@@ -75,23 +90,20 @@ module VagrantPlugins
             switches = @env[:machine].provider.driver.execute("get_switches.ps1", {})
             raise Errors::NoSwitches if switches.empty?
 
-            switch = choose_option_from(switches, "adapter")
+            switch = choose_option_from(switches, "switch")
             switch_type = nil
             case switch["SwitchType"]
             when 1
               switch_type = "Internal"
-            when 0
-              switch_type = "Private"
             when 2
               switch_type = "External"
             end
             options = { vm_id: @env[:machine].id,
                         type: switch_type.downcase,
-                        name: switch["Name"],
-                        adapter: ""
+                        name: switch["Name"]
                       }
             @env[:ui].info "Creating a #{options[:type]} switch with name #{options[:name]}"
-            @env[:machine].provider.driver.create_network_switch(options)
+            @env[:machine].provider.driver.add_swith_to_vm(options)
           end
         end
 

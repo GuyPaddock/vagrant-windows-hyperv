@@ -7,6 +7,18 @@ en:
         Hyper-V machine isn't running. Can't RDP in!
     choose_bridge: |-
       Please select a bridge from the available network adapters
+    virtual_switch_info: |-
+      Vagrant works well with Hyper-V's External Switch. If you are using an Internal switch
+      please make sure that this switch is properly configured for network connection.
+      The virtual machine must be reachable from the host for Vagrant to work.
+    no_private_switch: |-
+      Vagrant cannot work with Hyper-V's private switch, since this configuration
+      will not allow the host to communicate with the VM. Please refer to Hyper-V's
+      virtual switch configuration for more information.
+    external_switch_exists: |-
+      Hyper-V allows to have only one external switch. There is one already available.
+      Please check the Virtual Switch Manager in Hyper-V Manager.
+      Ignoring the customization and moving on.
     errors:
       ssh_not_available: |-
         SSH is available for non windows guest. Vagrant detected guest to be %{guest}
@@ -26,3 +38,7 @@ en:
         You can also use the customize option to add a virtual switch to this VM.
         For more help, please see the documentation on the Vagrant website
         for Hyper-V.
+      network_down: |-
+        The host network seems to be down, this generally happens while creating an
+        external network, it looked like Hyper-V manager took a long time to bring back
+        the network. Please check the netwotk connection and try again.
