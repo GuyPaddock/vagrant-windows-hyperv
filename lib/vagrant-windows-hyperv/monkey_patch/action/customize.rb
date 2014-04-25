@@ -72,10 +72,10 @@ module VagrantPlugins
               when "External switch exist"
                 @env[:ui].detail I18n.t("vagrant_win_hyperv.external_switch_exists")
             end
-            @env[:machine].provider.driver.add_swith_to_vm(options)
           else
             @env[:ui].detail I18n.t("vagrant_win_hyperv.virtual_switch_info")
           end
+          @env[:machine].provider.driver.add_swith_to_vm(options)
         end
 
         def validate_virtual_switch
@@ -110,7 +110,7 @@ module VagrantPlugins
         private
         def choose_option_from(options, key)
           if options.length > 1
-            @env[:ui].detail(I18n.t("vagrant_hyperv.choose_#{key}") + "\n ")
+            @env[:ui].detail(I18n.t("vagrant_win_hyperv.choose_#{key}") + "\n ")
             options.each_index do |i|
               option = options[i]
               @env[:ui].detail("#{i+1}) #{option["Name"]}")

@@ -16,11 +16,11 @@ $presentDir = Split-Path -parent $PSCommandPath
 try {
   $response = Create-Remote-Session $guest_ip $username $password
   if (!$response["session"] -and $response["error"]) {
-    $errortHash = @{
-      type = "PowerShellError"
-      error = $response["error"]
+    $session_message = $response['error']
+    $resultHash = @{
+      message = "$session_message"
     }
-    Write-Error-Message $errortHash
+    Write-Output-Message $resultHash
     return
   }
     function Remote-Execute() {
