@@ -11,6 +11,7 @@ FEATURES
       NOTE:
       If the adapter part if left blank, a list of available adapters will be displayed
       and the desired adapter can be selected.
+
       ```ruby
       config.vm.provider "hyperv" do |hv|
         hv.customize  ["virtual_switch", { type: "External", name: "External Switch", :adapter => "Ethernet" }]
