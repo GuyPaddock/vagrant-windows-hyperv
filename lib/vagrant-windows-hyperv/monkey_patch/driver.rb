@@ -41,6 +41,12 @@ module VagrantPlugins
         execute(script_path, options)
       end
 
+      def switch_exist(options)
+        load_path = Pathname.new(File.expand_path("../scripts", __FILE__))
+        script_path = load_path.join('switch_exist.ps1')
+        execute(script_path, options)
+      end
+
     end
   end
 end

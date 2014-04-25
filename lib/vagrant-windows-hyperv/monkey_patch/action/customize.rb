@@ -55,6 +55,11 @@ module VagrantPlugins
             @env[:ui].detail I18n.t("vagrant_win_hyperv.no_private_switch")
             return
           end
+          response = @env[:machine].provider.driver.switch_exist({ name: options[:name],
+                                              type: options[:type]})
+          if response["message"] == "switch exist"
+            return
+          end
 
           if options[:type] == "external"
             adapters = @env[:machine].provider.driver.list_net_adapters
@@ -69,11 +74,22 @@ module VagrantPlugins
               when "Network down"
                 # TODO:  Create a error class in core vagrant when merged.
                 raise VagrantPlugins::VagrantHyperV::Errors::NetworkDown
-              when "External switch exist"
-                @env[:ui].detail I18n.t("vagrant_win_hyperv.external_switch_exists")
+              when "Success"
+                add_swith_to_vm(options)
+                @env[:machine].provider.driver.add_swith_to_vm(options)
             end
           else
             @env[:ui].detail I18n.t("vagrant_win_hyperv.virtual_switch_info")
+            add_swith_to_vm(options)
+            @env[:machine].provider.driver.add_swith_to_vm(options)
+          end
+        end
+
+        def add_swith_to_vm(options)
+          current_vm_switch = @env[:machine].provider.driver.find_vm_switch_name
+          if current_vm_switch["network_adapter"].nil?
+            # TODO:  Create a error class in core vagrant when merged.
+            raise VagrantPlugins::VagrantHyperV::Errors::NoNetworkAdapter
           end
           @env[:machine].provider.driver.add_swith_to_vm(options)
         end
@@ -81,10 +97,6 @@ module VagrantPlugins
         def validate_virtual_switch
           @env[:ui].info "Validating Virtual Switch"
           current_vm_switch = @env[:machine].provider.driver.find_vm_switch_name
-          if current_vm_switch["network_adapter"].nil?
-            # TODO:  Create a error class in core vagrant when merged.
-            raise VagrantPlugins::VagrantHyperV::Errors::NoNetworkAdapter
-          end
 
           if current_vm_switch["switch_name"].nil?
             switches = @env[:machine].provider.driver.execute("get_switches.ps1", {})
@@ -103,7 +115,7 @@ module VagrantPlugins
                         name: switch["Name"]
                       }
             @env[:ui].info "Creating a #{options[:type]} switch with name #{options[:name]}"
-            @env[:machine].provider.driver.add_swith_to_vm(options)
+            add_swith_to_vm(options)
           end
         end
 
