@@ -4,7 +4,7 @@ FEATURES
   - ### CUstomization for Virtual Switch
   - Add customization for adding virtual switch. User can choose either External or
     Internal switch which will be attached to the VM on `vagrant up` or `vagrant reload`
-    - **NOTE:** Vagrant best works with External switch, if you are using an Internal switch
+    - **NOTE:** Vagrant works best with External switch, if you are using an Internal switch
     make sure the switch is properly configured for vagrant to communicate with the VM and
     the VM back to the host.
     - Example for configuration
