@@ -6,7 +6,7 @@ Hyper-V provider is available by default in Vagrant with version 1.5 and up. Thi
 
 
 ## Installation
-Install Vagrant 1.5 (or higher)
+Install Vagrant 1.5.4
 http://www.vagrantup.com/downloads.html
 
 
@@ -57,11 +57,22 @@ end
 * A new command vagrant rdp is introduced to connect to the Windows VM
 ` vagrant rdp `
 
+### Customization
+* Add customization for adding virtual switch. User can choose either External or
+  Internal switch which will be attached to the VM on `vagrant up` or `vagrant reload`
+  - **NOTE:** Vagrant works best with External switch, if you are using an Internal switch
+  make sure the switch is properly configured for vagrant to communicate with the VM and
+  the VM back to the host.
+  - Example for configuration
 
-### Provision Command
-* Provision command works for Vagrant hyper-v with this plugin installed
-` vagrant provision `
+    **NOTE:** If the adapter part if left blank, a list of available adapters will be displayed
+    and the desired adapter can be selected.
 
+    ```ruby
+    config.vm.provider "hyperv" do |hv|
+      hv.customize  ["virtual_switch", { type: "External", name: "External Switch", :adapter => "Ethernet" }]
+    end
+    ```
 
 ## Troubleshooting
 
