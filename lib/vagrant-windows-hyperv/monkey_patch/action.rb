@@ -9,6 +9,7 @@ module VagrantPlugins
 
       def self.action_up
         Vagrant::Action::Builder.new.tap do |b|
+          b.use CheckEnabled
           b.use HandleBox
           b.use ConfigValidate
           b.use Call, IsState, :not_created do |env1, b1|
