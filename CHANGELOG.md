@@ -1,7 +1,8 @@
 ## 1.0.3 (Unreleased)
 
 FEATURES
-  - ### CUstomization for Virtual Switch
+
+#### Customization for Virtual Switch
   - Add customization for adding virtual switch. User can choose either External or
     Internal switch which will be attached to the VM on `vagrant up` or `vagrant reload`
     - **NOTE:** Vagrant works best with External switch, if you are using an Internal switch
@@ -26,6 +27,7 @@ IMPROVEMENTS
 BUGFIXES
 
   - Fix module path for Puppet manifests.
+  - Fix race condition while enabling Guest Services [GH-61]
 
 ## Previous
 
