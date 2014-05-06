@@ -20,15 +20,35 @@ $presentDir = Split-Path -parent $PSCommandPath
 try {
   # Enable Guest Service Interface if they are disabled
   try {
-    Get-VM -Id $vm_id | Get-VMIntegrationService -Name "Guest Service Interface" | Enable-VMIntegrationService -Passthru
-        Do
-        {    
-            sleep 1
-            $Operational = Get-VM  -Id $vm_id | Get-VMIntegrationService -Name "Guest Service Interface" 
+    $Operational = $null
+    $maxAttempt = 5
+    do {
+       $maxAttempt = $maxAttempt - 1
+       $Operational = Get-VM -Id $vm_id | Get-VMIntegrationService -Name "Guest Service Interface"
+       if (-not $Operational.Enabled) {
+        Get-VM  -Id $vm_id | Get-VMIntegrationService -Name "Guest Service Interface"  | Enable-VMIntegrationService -Passthru
+        sleep 1
         }
-        While ($Operational.PrimaryStatusDescription -ne "OK")
+      }
+      While ( !$Operational.Enabled -and $maxAttempt -gt 0 )
     }
-    catch { }
+    catch {
+      $errortHash = @{
+        type = "PowerShellError"
+        error = "$_"
+      }
+      Write-Error-Message $errortHash
+      return
+     }
+
+  if (!$Operational -or !$Operational.ENabled) {
+    $errortHash = @{
+      type = "PowerShellError"
+      error = "Could not enable Guest Service Interface."
+    }
+    Write-Error-Message $errortHash
+    return
+  }
 
   function Upload-FIle-To-VM($host_path, $guest_path, $machine) {
     Write-Host $host_path
@@ -41,7 +61,7 @@ try {
     if (!$response["session"] -and $response["error"]) {
       $errortHash = @{
         type = "PowerShellError"
-        message = $response["error"]
+        error = $response["error"]
       }
       Write-Error-Message $errorResult
       return
