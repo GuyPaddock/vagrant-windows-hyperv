@@ -28,9 +28,9 @@ try {
        if (-not $Operational.Enabled) {
         Get-VM  -Id $vm_id | Get-VMIntegrationService -Name "Guest Service Interface"  | Enable-VMIntegrationService -Passthru
         sleep 1
+        }
       }
-    }
-    While ( !$Operational.Enabled -and $maxAttempt -gt 0 )
+      While ( !$Operational.Enabled -and $maxAttempt -gt 0 )
     }
     catch {
       $errortHash = @{
@@ -41,14 +41,14 @@ try {
       return
      }
 
-    if (!$Operational -or !$Operational.ENabled) {
-      $errortHash = @{
-        type = "PowerShellError"
-        error = "Could not enable Guest Service Interface."
-      }
-      Write-Error-Message $errortHash
-      return
+  if (!$Operational -or !$Operational.ENabled) {
+    $errortHash = @{
+      type = "PowerShellError"
+      error = "Could not enable Guest Service Interface."
     }
+    Write-Error-Message $errortHash
+    return
+  }
 
   function Upload-FIle-To-VM($host_path, $guest_path, $machine) {
     Write-Host $host_path
