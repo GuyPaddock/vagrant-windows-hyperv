@@ -20,10 +20,14 @@ module VagrantPlugins
           # In this case we can try any remote PowerShell commands to see if
           # further vagrant can be carried out using this communication
           if !@winrm_status
-            status = false
+            @winrm_status = false
             response = @machine.provider.driver.check_winrm
-            @winrm_status = response["message"] == "Running"
-            raise Errors::WinRMNotReady if !@winrm_status
+            message = nil
+            if response && response["message"]
+              message = response["message"]
+              @winrm_status = message == "Running"
+            end
+            raise Errors::WinRMNotReady, message: message if !@winrm_status
           end
           @winrm_status
         end

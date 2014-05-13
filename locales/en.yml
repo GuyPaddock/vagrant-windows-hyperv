@@ -5,11 +5,68 @@ en:
       RDP session and enter the Virtual Machine's password.
     message_rdp_not_ready: |-
         Hyper-V machine isn't running. Can't RDP in!
+    choose_adapter: |-
+      Please select a adapter from the available network adapters.
+    choose_switch: |-
+      Please choose a switch to attach to your Hyper-V instance.
+      If none of these are appropriate, please open the Hyper-V manager
+      to create a new virtual switch.
+    virtual_switch_info: |-
+      Vagrant works well with Hyper-V's External Switch. If you are using an Internal switch
+      please make sure that this switch is properly configured for network connection.
+      The virtual machine must be reachable from the host for Vagrant to work.
+    no_private_switch: |-
+      Vagrant cannot work with Hyper-V's private switch, since this configuration
+      will not allow the host to communicate with the VM. Please refer to Hyper-V's
+      virtual switch configuration for more information.
+    external_switch_exists: |-
+      Hyper-V allows to have only one external switch. There is one already available.
+      Please check the Virtual Switch Manager in Hyper-V Manager.
+      Ignoring the customization and moving on.
+    private_switch_not_allowed: |-
+      Vagrant cannot work with Hyper-V's private switch, since this configuration
+      will not allow the host to communicate with the VM. Please refer to Hyper-V's
+      virtual switch configuration for more information.
+    internal_switch_warn: |-
+      Vagrant works best with Hyper-V's External Switch. If you are using an
+      Internal switch please make sure that this switch is properly configured
+      for network connection. The virtual machine must be reachable from the
+      host for Vagrant to work.
+    net_adapter_warn: |-
+      You seems to have provided an invalid adapter, please choose one from
+      the available list of adapters.
+    creating_switch: |-
+      Creating a virtual switch of type "%{type}" with name "%{name}"
+    add_switch_to_vm: |-
+      Setting the VM to use a Virtual switch of type "%{type}" with name "%{name}"
+
     errors:
       ssh_not_available: |-
         SSH is available for non windows guest. Vagrant detected guest to be %{guest}
       rdp_not_available: |-
         RDP is available for windows guest. Vagrant detected guest to be %{guest}
-      win_rm_not_ready: |-
-        WinRM is not enabled in the remot guest. Vagrant-Windows-HyperV uses remote PowerShell scripts
-        to communicate to the remote machine. Please check the same and try again.
+      win_rm_not_available: |-
+        Vagrant failed to communicate to the VM using powershell. The operation failed
+        with the following message.
+        %{message}
+      no_network_adapter: |-
+        No Network adapter is connected to this VM. Please use the HyperV Manage to add a network adapter.
+      no_switches: |-
+        There are no virtual switches created for Hyper-V! Please open
+        the Hyper-V Manager, go to the "Virtual Switch Manager", and create
+        at least one virtual switch.
+        A virtual switch is required for Vagrant to create a Hyper-V
+        machine that is connected to a network so it can access it.
+        You can also use the customize option to add a virtual switch to this VM.
+        For more help, please see the documentation on the Vagrant website
+        for Hyper-V.
+      network_down: |-
+        The host network seems to be down, this generally happens while creating an
+        external network, it looked like Hyper-V manager took a long time to bring back
+        the network. Please check the network connection and try again.
+      switch_not_found: |-
+        A Virtual switch of type "%{type}" and name "%{name}" is not found, please
+        create the same using Hyper-V "Virtual Switch Manager".
+      external_switch_exist: |-
+        Hyper-V allows to have only one external switch. There already exist one
+        with name "%{name}"
