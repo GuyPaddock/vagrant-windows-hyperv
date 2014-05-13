@@ -1,4 +1,4 @@
-## 1.0.3 (Unreleased)
+## 1.0.3 (13 May 2014)
 
 FEATURES
 
