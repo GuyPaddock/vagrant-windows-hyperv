@@ -38,6 +38,14 @@ module VagrantPlugins
         error_key(:network_down)
       end
 
+      class NoSwitchFound < VagrantHyperVError
+        error_key(:switch_not_found)
+      end
+
+      class ExternalSwitchExist < VagrantHyperVError
+        error_key(:external_switch_exist)
+      end
+
     end
   end
 end

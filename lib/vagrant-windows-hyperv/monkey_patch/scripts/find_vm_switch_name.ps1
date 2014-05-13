@@ -4,7 +4,8 @@
 #--------------------------------------------------------------------------
 
 param (
-    [string]$vm_id = $(throw "-vm_id is required.")
+    [Parameter(Mandatory=$true)]
+    [string]$vm_id
  )
 
 # Include the following modules

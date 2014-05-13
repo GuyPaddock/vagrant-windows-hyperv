@@ -4,10 +4,14 @@
 #--------------------------------------------------------------------------
 
 param (
-    [string]$type = $(throw "-type is required."),
-    [string]$name = $(throw "-name is required."),
-    [string]$vm_id = $(throw "-vm_id is required."),
-    [string]$adapter = ""
+    [Parameter(Mandatory=$true)]
+    [string]$type,
+    [Parameter(Mandatory=$true)]
+    [string]$name,
+    [Parameter(Mandatory=$true)]
+    [string]$vm_id,
+    [Parameter(Mandatory=$true)]
+    [string]$adapter
  )
 
 # Include the following modules
@@ -24,10 +28,7 @@ try {
   $operation_pass = $false
   do {
     try {
-      if ($type -ne "external") {
-        # Do not create a switch other than of type external
-        # New-VMSwitch -Name "$name" -SwitchType "$type" -ErrorAction "stop"
-      } else {
+      if ($type -eq "external") {
         New-VMSwitch -Name "$name" -NetAdapterName $adapter -ErrorAction "stop"
       }
       $operation_pass = $true

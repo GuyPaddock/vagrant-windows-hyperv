@@ -4,13 +4,22 @@
 #--------------------------------------------------------------------------
 
 param (
-    [string]$type = $(throw "-type is required."),
-    [string]$name = $(throw "-name is required."),
-    [string]$vm_id = $(throw "-vm_id is required.")
+  [Parameter(Mandatory=$true)]
+  [string]$type,
+  [Parameter(Mandatory=$true)]
+  [string]$name,
+  [Parameter(Mandatory=$true)]
+  [string]$vm_id,
+  [Parameter(Mandatory=$false)]
+  [string]$adapter
  )
 
+# Include the following modules
+$Dir = Split-Path $script:MyInvocation.MyCommand.Path
+. ([System.IO.Path]::Combine($Dir, "utils\write_messages.ps1"))
+
 try {
-# Add the switch to the VM's network adapter
+
    $vm = Get-VM -Id $vm_id -ErrorAction "stop"
     Get-VMSwitch "$name" | Where-Object { $_.SwitchType -eq "$type" } `
     | Connect-VMNetworkAdapter -VMName $vm.Name

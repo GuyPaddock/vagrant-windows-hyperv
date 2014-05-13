@@ -4,8 +4,10 @@
 #--------------------------------------------------------------------------
 
 param (
-    [string]$type = $(throw "-type is required."),
-    [string]$name = $(throw "-name is required.")
+    [Parameter(Mandatory=$true)]
+    [string]$type,
+    [Parameter(Mandatory=$true)]
+    [string]$name
  )
 
  # Include the following modules
@@ -16,8 +18,10 @@ try {
   if ($type -eq "external") {
     $switch_exist = Get-VMSwitch -SwitchType  "$type"
     if ($switch_exist) {
+      $switch_name = $switch_exist.name
       $resptHash = @{
         message = "switch exist"
+        switch_name = "$switch_name"
       }
       Write-Output-Message $(ConvertTo-JSON $resptHash)
       return
@@ -28,12 +32,15 @@ try {
     | Select-Object Name `
     | Where-Object { $_.name -eq $name })
   if ($switch_exist) {
+    $switch_name = $switch_exist.name
     $resptHash = @{
       message = "switch exist"
+      switch_name = "$switch_name"
     }
   } else {
     $resptHash = @{
       message = "switch not exist"
+      switch_name = "$name"
     }
   }
     Write-Output-Message $(ConvertTo-JSON $resptHash)
